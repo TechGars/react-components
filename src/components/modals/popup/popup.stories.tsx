@@ -1,5 +1,6 @@
 import { Popup } from '.';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Primary } from '../../buttons/Primary';
 
 
 const meta = {
@@ -25,15 +26,17 @@ export const Main = () => {
 
       <Popup
         ref={testRef}
+        backdrop
         blur='sm'
-        backdrop='md'
+        opacity='md'
+        className='rounded-md bg-gray-700 text-white shadow-button-up drop-shadow-scaled'
         close={() => testRef.current?.close()}
       >
 
-        <div className=' text-white text-2xl p-20 flex flex-col bg-dark-grey  h-full w-full'>Click anywhere outside of the modal to close</div>
+        <div className='text-2xl p-20 flex flex-col h-full w-full'>Click anywhere outside of the modal to close</div>
       </Popup>
 
-      <button onClick={() => testRef.current?.showModal()} className='cursor-pointer text-white text-2xl'>Open Modal</button>
+      <Primary onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 bg-dark-grey'>Open Modal</Primary>
     </div>
   )
 }
@@ -51,13 +54,16 @@ export const slideUp = () => {
       <Popup
         ref={testRef}
         variant='up'
+        backdrop
+        opacity='md'
         close={() => testRef.current?.close()}
+        className='bg-dark-grey text-white rounded-md'
       >
 
-        <div className=' text-white text-2xl p-20 flex flex-col bg-dark-grey  h-full w-full'>Click anywhere outside of the modal to close</div>
+        <div className='text-2xl p-20 h-full w-full'>Click anywhere outside of the modal to close</div>
       </Popup>
 
-      <button onClick={() => testRef.current?.showModal()} className='cursor-pointer text-white text-2xl'>Open Modal</button>
+      <Primary onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 rounded-md bg-dark-grey'>Open Modal</Primary>
     </div>
   )
 }
@@ -75,13 +81,16 @@ export const slideRight = () => {
       <Popup
         ref={testRef}
         variant='right'
+        backdrop
+        opacity='md'
         close={() => testRef.current?.close()}
+        className='rounded-3xl text-white bg-gray-700'
       >
 
-        <div className=' text-white text-2xl p-20 flex flex-col bg-dark-grey  h-full w-full'>Click anywhere outside of the modal to close</div>
+        <div className='text-2xl p-20 flex flex-col h-full w-full'>Click anywhere outside of the modal to close</div>
       </Popup>
 
-      <button onClick={() => testRef.current?.showModal()} className='cursor-pointer text-white text-2xl'>Open Modal</button>
+      <Primary onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 rounded-xl bg-dark-grey'>Open Modal</Primary>
     </div>
   )
 }
@@ -100,12 +109,13 @@ export const slideLeft = () => {
         ref={testRef}
         variant='left'
         close={() => testRef.current?.close()}
+        className='text-white bg-dark-grey'
       >
 
-        <div className=' text-white text-2xl p-20 flex flex-col bg-dark-grey  h-full w-full'>Click anywhere outside of the modal to close</div>
+        <div className='text-2xl p-20 flex flex-col h-full w-full'>Click anywhere outside of the modal to close</div>
       </Popup>
 
-      <button onClick={() => testRef.current?.showModal()} className='cursor-pointer text-white text-2xl'>Open Modal</button>
+      <Primary onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 rounded-3xl bg-dark-grey'>Open Modal</Primary>
     </div>
   )
 }
@@ -124,13 +134,42 @@ export const scale = () => {
         ref={testRef}
         variant='scale'
         close={() => testRef.current?.close()}
-
+        className='text-white bg-dark-grey'
       >
 
-        <div className=' text-white bg-dark-grey text-2xl p-20 flex flex-col  h-full w-full'>Click anywhere outside of the modal to close</div>
+        <div className='text-2xl p-20 flex flex-col h-full w-full'>Click anywhere outside of the modal to close</div>
       </Popup>
 
-      <button onClick={() => testRef.current?.showModal()} className='cursor-pointer text-white text-2xl'>Open Modal</button>
+      <Primary onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 rounded-xl bg-dark-grey'>Open Modal</Primary>
+    </div>
+  )
+}
+
+export const glass = () => {
+  const testRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    testRef.current?.showModal()
+  },[])
+  
+  return(
+    <div className='flex items-center justify-center w-screen h-screen bg-[url("https://images.pexels.com/photos/3750777/pexels-photo-3750777.jpeg?")] bg-cover'>
+
+      <Popup
+        ref={testRef}
+        variant='right'
+        glass
+        glassBlur='md'
+        backdrop
+        opacity='md'
+        close={() => testRef.current?.close()}
+        className='rounded-3xl text-white'
+      >
+
+        <div className='text-2xl p-20 flex flex-col h-full w-full'>Click anywhere outside of the modal to close</div>
+      </Popup>
+
+      <Primary glass  onClick={() => testRef.current?.showModal()} className='text-white text-2xl px-5 py-2 rounded-xl'>Open Modal</Primary>
     </div>
   )
 }

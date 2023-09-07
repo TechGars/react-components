@@ -1,5 +1,6 @@
 import { Toast } from '.';
 import React, { useEffect, useState } from 'react';
+import { Primary } from '../buttons/Primary';
 
 
 const meta = {
@@ -21,7 +22,7 @@ export const Main = () => {
   },[])
   
   return(
-    <div className='flex items-center justify-center w-screen h-screen'>
+    <div className='flex items-center justify-center w-screen h-screen bg-slate-300'>
 
       <Toast
         message={ message }
@@ -29,7 +30,30 @@ export const Main = () => {
         className='bg-dark-grey text-white rounded-lg'
       />
 
-      <span onClick={() => setIsMessage('This is an example toast message displayed')} className='cursor-pointer'>Open Toast</span>
+      <Primary onClick={() => setIsMessage('This is an example toast message displayed')} className='p-3 rounded-lg'>Open Toast</Primary>
+    </div>
+  )
+}
+
+export const Glass = () => {
+  const [message, setIsMessage] = useState<string|null>()
+  
+  useEffect(() => {
+    setIsMessage('This is an example toast message displayed')
+  },[])
+  
+  return(
+    <div className='flex items-center justify-center w-screen h-screen bg-[url("https://images.pexels.com/photos/3750777/pexels-photo-3750777.jpeg?")] bg-cover'>
+
+      <Toast
+        message={ message }
+        close={() => setIsMessage(null)}
+        glass
+        glassBlur='md'
+        className='text-white rounded-lg'
+      />
+
+      <Primary glass glassBlur='md' onClick={() => setIsMessage('This is an example toast message displayed')} className='p-3 rounded-lg text-white'>Open Toast</Primary>
     </div>
   )
 }

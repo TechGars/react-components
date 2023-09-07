@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ComponentPropsWithRef, Ref, forwardRef, useEffect, useState } from 'react';
 import classNames from "classnames"
 import iconsList from './icons.json'
 import type {regular, solids, logos} from './types'
@@ -6,11 +6,8 @@ import type {regular, solids, logos} from './types'
 
 export type iconsListType = regular[number] | solids[number] | logos[number]
 
-type iconComponentPropType = {
+export type iconProps = ComponentPropsWithRef<'i'> & {
     name: iconsListType
-    fallback?:string
-    className?:string
-    onClick?:() => void
 }
 
 type regularIcon = {
@@ -37,7 +34,7 @@ type normalizedIconType = {
 }
 
 
-export function Icon({ name, className, onClick }:iconComponentPropType):JSX.Element{
+export const Icon = forwardRef(({ name, className, ...props }:iconProps, ref:Ref<HTMLElement>) => {
 
     const [icon, setIcon] = useState<normalizedIconType|null|undefined>(null)
     
@@ -45,11 +42,11 @@ export function Icon({ name, className, onClick }:iconComponentPropType):JSX.Ele
         setIcon(findIcon(name))
     },[])
     
-    if(!icon) return <i className={`bx bx-question-mark`}></i>
+    if(!icon) return <i {...props} ref={ref} className={`bx bx-question-mark`}/>
         
-    return <i onClick= {onClick } className={classNames([icon.iconName, className])}></i>
+    return <i {...props} ref={ref} className={classNames([icon.iconName, className])}/>
     
-}
+})
 
 
 function getIcons(){

@@ -1,64 +1,87 @@
-import React, { ComponentPropsWithoutRef, InputHTMLAttributes } from 'react';
+import React, { ComponentPropsWithoutRef, InputHTMLAttributes, Ref, forwardRef } from 'react';
 import classNames from "classnames"
+import { Icon } from '../dynamicIcon';
 
 
 type Variant = 'standard' | 'rounded' | 'underline'
-type roundness = 'sm' | 'md' | 'lg'
+type size = 'sm' | 'md' | 'lg' 
 
 type generalProps = {
     variant:Variant
+    glass?:boolean
+    scaleOnFocus?:boolean
 }
 
 type rounded = {
     variant: 'rounded'
-    roundness: roundness
+    radius: size
 }
 
 type notRounded = {
     variant: 'standard' | 'underline'
 }
 
-type inputProps = InputHTMLAttributes<HTMLInputElement> & generalProps & (rounded | notRounded)
-type textAreaProps = ComponentPropsWithoutRef<'textarea'> & generalProps & (rounded | notRounded)
+type glassType = {
+    glass:true
+    /** the size of blur to apply to the modal if glass prop is true*/
+    glassBlur?:size
+}
 
-export function LabeledInput(props:inputProps ){
-    const { name, type, variant, className,  ...rest } = props
+type standardType = {
+    glass?:false
+}
 
-    const borderStyleMap:{ [variant in Variant] :string } = {
-        standard:'border-2',
-        rounded: 'border-2',
-        underline: 'border-b-2 border-dark-grey'
+export type inputProps = InputHTMLAttributes<HTMLInputElement> & generalProps & (rounded | notRounded) & (standardType | glassType)
+export type textAreaProps = ComponentPropsWithoutRef<'textarea'> & generalProps & (rounded | notRounded) & (standardType | glassType)
+
+export const LabeledInput = forwardRef((props:inputProps, ref:Ref<HTMLInputElement> ) => {
+
+    const { name, required, type, variant, glass, scaleOnFocus, className,  ...rest } = props
+
+    const borderStyleMap:{ [option in Variant]:string } = {
+        standard:'border-[3px]',
+        rounded: 'border-[3px]',
+        underline: 'border-b-[3px] border-dark-grey'
     }
 
-    const roundedBorderSize = {
+    const roundedBorderSize:{ [option in size]:string } = {
         sm: 'rounded-lg',
         md: 'rounded-2xl',
         lg: 'rounded-3xl'
     }
     
-    const shadowMap = {
+    const shadowMap:{ [variant in Variant]:string } = {
+        rounded: 'drop-shadow-standard shadow-inner',
         standard: 'drop-shadow-standard shadow-inner',
         underline: 'drop-shadow-underline',
     }
 
+    const dropShadow =  shadowMap[variant]
+    const underlineShadow = variant === 'underline' && 'shadow-none border-b-5 border-black/[.5] focus:shadow-none'
+
     const borderStyle = borderStyleMap[variant]
-    const borderRoundness = variant === 'rounded' && roundedBorderSize[props.roundness]
-    const dropShadow = variant === 'underline' ? shadowMap['underline'] : shadowMap['standard']
+    const borderRadius = variant === 'rounded' && roundedBorderSize[props.radius]
 
     return(
-        <div className={classNames([`relative flex flex-col-reverse flex-1 group/input bg-inherit`])}>
+        <div className={classNames([`relative flex flex-col group/input`])}>
            
             <input 
-                required
+                id={ name } 
+                ref={ ref }
                 type={ type } 
                 name={ name } 
-                id={ name } 
+                placeholder=' '
                 autoComplete="_"
+                required={ required }
                 className={classNames([
-                    `peer border-transparent px-[1rem] w-full h-[3rem] transition ease duration-500`,
-                    `focus:outline-none focus:ring`,
+                    `peer transition ease duration-500 bg-inherit shadow-input-out`,
+                    `border-transparent p-3 w-full brightness-95`,
+                    `focus:outline-none focus:ring focus:shadow-input-in focus:scale-[.99] focus:brightness-100`,
+                    scaleOnFocus && 'focus:drop-shadow-scaled focus:scale-[1.05]',
+                    glass && 'bg-black/[.07] backdrop-blur-lg backdrop-brightness-75',
+                    underlineShadow,
                     borderStyle,
-                    borderRoundness,
+                    borderRadius,
                     dropShadow,
                     className
                 ])}
@@ -69,58 +92,74 @@ export function LabeledInput(props:inputProps ){
                 id={ name }
                 htmlFor={ name } 
                 className={classNames(`
-                    absolute translate-y-[60%] w-full h-full translate-x-[7%] uppercase tracking-[.2rem] transition ease duration-500`,
+                    absolute -top-[1.5rem] left-3 translate-y-[2.5rem] uppercase tracking-[.2rem] transition ease duration-500`,
 
-                    'bg-dark-grey bg-clip-text text-transparent invert grayscale mix-blend-difference',
+                    'brightness-[110%]',
                     
-                    'group-focus-within/input:translate-y-3 group-focus-within/input:translate-x-[5%]',
+                    'group-focus-within/input:translate-y-0',
+
+                    'peer-[:not(:placeholder-shown)]:translate-y-0',
                     
-                    'peer-valid:translate-y-3 peer-valid:translate-x-[5%]',
+                    required && `-translate-x-[1rem] peer-valid:translate-x-0 peer-valid:[&>i]:scale-100
+                    after:content-['*'] after:ml-0.5 after:text-red-500 peer-valid:after:content-['']`
+
                 )}
             >
-                { name }
+                {required ? <Icon name='check-circle' className={`text-green-600 transition ease duration-500 scale-0`} />: null}
+
+                <p className='inline bg-gray-500 bg-clip-text text-transparent invert grayscale mix-blend-difference'>{ name }</p>
             </label>
+
             
         </div>
     )
-}
+})
 
-export function LabeledTextArea(props:textAreaProps){
+export const LabeledTextArea = forwardRef((props:textAreaProps, ref:Ref<HTMLTextAreaElement>) => {
 
-    const { name, variant, className, ...rest } = props
+    const { name, required, variant, scaleOnFocus, glass, className, ...rest } = props
 
-    const borderStyleMap:{ [variant in Variant] :string } = {
-        standard:'border-2',
-        rounded: 'border-2',
-        underline: 'border-b-2 border-dark-grey'
+    const borderStyleMap:{ [option in Variant]:string } = {
+        standard:'border-[3px]',
+        rounded: 'border-[3px]',
+        underline: 'border-b-[3px] border-dark-grey'
     }
 
-    const roundedBorderSize = {
+    const roundedBorderSize:{ [option in size]:string } = {
         sm: 'rounded-lg',
         md: 'rounded-2xl',
         lg: 'rounded-3xl'
     }
     
-    const shadowMap = {
+    const shadowMap:{ [variant in Variant]:string } = {
+        rounded: 'drop-shadow-standard shadow-inner',
         standard: 'drop-shadow-standard shadow-inner',
         underline: 'drop-shadow-underline',
     }
 
-    const borderStyle = borderStyleMap[variant]
-    const borderRoundness = variant === 'rounded' && roundedBorderSize[props.roundness]
-    const dropShadow = variant === 'underline' ? shadowMap['underline'] : shadowMap['standard']
+    const underlineShadow = variant === 'underline' && 'shadow-none border-b-5 border-black/[.5] focus:shadow-none'
 
+    const dropShadow = shadowMap[variant]
+    const borderStyle = borderStyleMap[variant]
+    const borderRoundness = variant === 'rounded' && roundedBorderSize[props.radius]
+    
 
     return(
-        <div className={classNames([`relative flex flex-col-reverse flex-1 group/input`])}>
+        <div className={classNames([`relative flex flex-col group/input bg-transparent`])}>
            
             <textarea 
-                required
-                name={ name } 
                 id={ name } 
+                ref={ ref }
+                name={ name } 
+                placeholder=' '
+                required={ required }
                 className={classNames([
-                    `peer border-transparent border-solid px-[1rem] w-full transition ease duration-500`,
-                    `focus:outline-none focus:ring`,
+                    `peer transition ease duration-500 bg-inherit shadow-input-out`,
+                    `border-transparent px-[1rem] w-full brightness-95`,
+                    `focus:outline-none focus:ring focus:shadow-input-in focus:scale-[.99] focus:brightness-100`,
+                    scaleOnFocus && 'focus:drop-shadow-scaled focus:scale-[1.05]',
+                    glass && 'bg-black/[.07] backdrop-blur-lg backdrop-brightness-75',
+                    // underlineShadow,
                     borderStyle,
                     borderRoundness,
                     dropShadow,
@@ -128,19 +167,31 @@ export function LabeledTextArea(props:textAreaProps){
                 ])}
                 {...rest}
             />
+            
 
             <label 
                 id={ name }
                 htmlFor={ name } 
                 className={classNames(`
-                    absolute translate-y-1/3 translate-x-[12%] uppercase text-sm mb-[1rem] tracking-[.2rem] transition ease duration-500`,
-                    'group-focus-within/input:-translate-y-[5.5rem] group-focus-within/input:translate-x-2',
-                    'peer-valid:translate-y-5 peer-valid:translate-x-0'
+                    absolute -top-[2rem] left-3 translate-y-[5.5rem] uppercase tracking-[.2rem] transition ease duration-500`,
+
+                    'brightness-[110%]',
+                    
+                    'group-focus-within/input:-translate-y-0 group-focus-within/input:-translate-x-2',
+                    
+                    'peer-[:not(:placeholder-shown)]:-translate-y-0 peer-[:not(:placeholder-shown)]:-translate-x-2',
+                    
+                    required && `-translate-x-[1rem] group-focus-within/input:-translate-x-[2rem] peer-valid:[&>*]:scale-100 
+                    after:content-['*'] after:ml-0.5 after:text-red-500 peer-valid:after:content-['']
+                    `
+
+
                 )}
             >
-                { name }
+                {required ? <Icon name='check-circle' className={`text-green-600 transition ease duration-300 scale-0`} />: null}
+                <p className='inline bg-gray-500 bg-clip-text text-transparent invert grayscale mix-blend-difference'>{ name }</p>
             </label>
             
         </div>
     )
-}
+})

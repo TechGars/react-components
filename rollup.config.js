@@ -4,13 +4,13 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import del from 'rollup-plugin-delete';
 import postcss from 'rollup-plugin-postcss';
-import pkg from './package.json';
+import pkg from './package.json'
 const postcssConfig = require('./postcss.config');
 
 /* eslint-disable-next-line import/no-default-export */
 export default [
   {
-    input: 'src/index.ts',
+    input: './src/index.ts',
     output: [
       { file: pkg.main, format: 'cjs' },
       { file: pkg.module, format: 'esm' },

@@ -1,43 +1,63 @@
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, Ref, forwardRef } from 'react';
 import classNames from "classnames";
 
 
-type drawerPositions = ["left-center" , "right-center" , "top-left" , "top-center" , "top-right" , "bottom-left" , "bottom-center" , "bottom-right"]
-type openVariant = ["top" , "right" , "bottom" , "left"]
-type blurSize = ['sm' , 'md' , 'lg' , 'none']
-type backdropBrightness = blurSize
+type drawerPositions = "left-center" | "right-center" | "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"
+type variant = "top" | "right" | "bottom" | "left"
+type size = 'sm' | 'md' | 'lg'
 
-type DrawerProps = {
-    overlayNone?:boolean
+
+type baseProps = {
     isOpen :boolean
-    openVariant: openVariant[number]
-    positioned?: drawerPositions[number]
+    variant: variant
+    backdrop?:boolean
+    glass?:boolean
+    positioned?: drawerPositions
     closeDrawer: () => void
 }
 
 
+
 type backdrop = {
     backdrop:true
-    bdBlur?: blurSize[number]
-    bdDark?: backdropBrightness[number]
+    /** the size of background blur to apply behind the modal if backdrop props is true*/
+    blur?:size
+    /** how dark of a background to apply behind the modal if backdrop props is true*/
+    opacity?:size
 }
 
 type backdropNone = {
     backdrop?:false
 }
-export function Drawer(props:HTMLAttributes<HTMLSpanElement> & DrawerProps & (backdrop | backdropNone)){
+
+type glassType = {
+    glass:true
+    /** the size of blur to apply to the modal if glass prop is true*/
+    glassBlur?:size
+}
+
+type standardType = {
+    glass?:false
+}
+
+
+export type DrawerProps = HTMLAttributes<HTMLSpanElement> & baseProps & (backdrop | backdropNone) & (standardType | glassType)
+
+export const Drawer = forwardRef((props: DrawerProps, ref:Ref<HTMLSpanElement>) => {
 
     const {
         isOpen, 
         children, 
         className, 
         positioned,
-        openVariant,
+        variant,
+        backdrop,
+        glass,
         closeDrawer,
         ...otherProps
     } = props
 
-    const userSetPositionMap = {
+    const userSetPositionMap:{ [option in drawerPositions]:string} = {
         "top-left": "items-start justify-start",
         "top-center": "items-start justify-center",
         "top-right": "items-start justify-end",
@@ -48,32 +68,32 @@ export function Drawer(props:HTMLAttributes<HTMLSpanElement> & DrawerProps & (ba
         "right-center": "items-center justify-end",
     }
 
-    const openAnimationMap = {
-        'top': { openAnimation:'translate-y-0', closeAnimation:'-translate-y-full', autoPositioning:'justify-start items-start' },
-        'right': { openAnimation:'translate-x-0', closeAnimation:'translate-x-full', autoPositioning:'justify-end items-start' },
-        'bottom': { openAnimation:'translate-y-0', closeAnimation:'translate-y-full', autoPositioning:'justify-start items-end' },
-        'left': { openAnimation:'translate-x-0', closeAnimation:'-translate-x-full', autoPositioning:'justify-start items-start' },
+    const openAnimationMap:{ [option in variant]:{open:string, close:string, autoPositioning:string}} = {
+        top: { open:'translate-y-0', close:'-translate-y-full', autoPositioning:'justify-start items-start' },
+        right: { open:'translate-x-0', close:'translate-x-full', autoPositioning:'justify-end items-start' },
+        bottom: { open:'translate-y-0', close:'translate-y-full', autoPositioning:'justify-start items-end' },
+        left: { open:'translate-x-0', close:'-translate-x-full', autoPositioning:'justify-start items-start' },
     }
 
  
-    const backdropBlurMap = {
-        'sm': 'backdrop-blur-sm',
-        'md': 'backdrop-blur-md',
-        'lg': 'backdrop-blur-lg',
+    const backdropBlurMap:{ [option in size]:string } = {
+        sm: 'backdrop-blur-sm',
+        md: 'backdrop-blur-md',
+        lg: 'backdrop-blur-lg',
     }
-    const backdropOpacityMap = {
-        'sm': 'backdrop-brightness-[.75]',
-        'md': 'backdrop-brightness-[.5]',
-        'lg': 'backdrop-brightness-[.1]',
-        'standard': 'backdrop-brightness-[.90]'
+
+    const backdropOpacityMap:{ [option in size]:string } = {
+        sm: 'backdrop-brightness-[.75]',
+        md: 'backdrop-brightness-[.5]',
+        lg: 'backdrop-brightness-[.1]',
     }
 
     const userSetPosition = positioned && userSetPositionMap[positioned]
-    const {openAnimation, closeAnimation, autoPositioning} = openAnimationMap[openVariant]
+    const {open:openAnimation, close:closeAnimation, autoPositioning} = openAnimationMap[variant]
 
-    const backdropBlur = props.backdrop && props.bdBlur && backdropBlurMap[props.bdBlur]
-    const backdropBrightness = props.backdrop && props.bdDark && backdropOpacityMap[props.bdDark]
-    const backdropStandard = props.backdrop && !props.bdBlur && !props.bdDark && backdropOpacityMap['standard']
+    const backdropBrightness = props.backdrop && backdropOpacityMap[props.opacity ?? 'sm']
+    const backdropBlur = props.backdrop && props.blur && backdropBlurMap[props.blur]
+    const glassBackgroundBlur = glass && backdropBlurMap[props.glassBlur ?? 'sm']
 
     const hideDrawerOnClose = !isOpen && 'animate-hide-drawer'
 
@@ -86,13 +106,13 @@ export function Drawer(props:HTMLAttributes<HTMLSpanElement> & DrawerProps & (ba
     return(
         <span 
             id='drawer'
+            ref={ ref }
             className={classNames([
-                "absolute h-full w-full flex overflow-hidden transition ease duration-300",
+                "absolute h-full w-full flex overflow-hidden",
                 autoPositioning,
                 userSetPosition,
-                backdropBlur,
-                backdropStandard,
                 backdropBrightness,
+                backdropBlur,
                 hideDrawerOnClose
             ])} 
             onClick={ handleClose }
@@ -100,8 +120,10 @@ export function Drawer(props:HTMLAttributes<HTMLSpanElement> & DrawerProps & (ba
 
             <span 
                 className={classNames([
-                    "transition ease-in-out duration-300 shadow-lg shadow-black flex justify-center items-center",
+                    "transition ease-in-out duration-100 flex justify-center items-center",
                     isOpen ? openAnimation : closeAnimation,
+                    glass && 'bg-white/[.07] shadow-button-up',
+                    glassBackgroundBlur,
                     className
                 ])}
 
@@ -113,5 +135,5 @@ export function Drawer(props:HTMLAttributes<HTMLSpanElement> & DrawerProps & (ba
         </span>
     )
 
-}
+})
 

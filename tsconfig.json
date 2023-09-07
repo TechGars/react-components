@@ -8,6 +8,7 @@
     "allowJs": true,
     "jsx": "react",
     "declaration": true,
+    "typeRoots": ["./dist/index.d.ts"],
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

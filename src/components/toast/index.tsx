@@ -1,18 +1,41 @@
 
-import React, { ComponentPropsWithRef, useEffect, useState } from "react";
+import React, { ComponentPropsWithRef, Ref, forwardRef, useEffect, useState } from "react";
 import classNames from "classnames";
+import { Icon } from "../dynamicIcon";
 
 
-interface ToastProps {
+type baseProps = ComponentPropsWithRef<'div'> & {
     message:string|null|undefined
+    //**Open duration in seconds */
     duration?: number
+    glass?:boolean
     close: () => void
     className?:string
 }
 
+type size = 'sm' | 'md' | 'lg'
 
-export function Toast({ message, close, duration, className }:ToastProps){
+type glassType = {
+    glass:true
+    /** the size of blur to apply to the modal if glass prop is true*/
+    glassBlur?: size
+}
+
+type standardType = {
+    glass?:false
+}
+
+export type ToastProps = baseProps & (standardType | glassType)
+
+export const Toast = forwardRef((props:ToastProps, ref:Ref<HTMLDivElement>) => {
+    const { message, close, duration, glass, className, ...rest } = props
     const [isOpen, setIsOpen] = useState(false)
+
+    const backdropBlurMap:{ [option in size]:string } = {
+        sm: 'backdrop-blur-sm',
+        md: 'backdrop-blur-md',
+        lg: 'backdrop-blur-lg',
+    }
 
     useEffect(() => {
 
@@ -20,7 +43,7 @@ export function Toast({ message, close, duration, className }:ToastProps){
             setIsOpen(true)
             setTimeout(() => {
                 handleClose()
-            }, duration ?? 3000);
+            }, duration ? duration * 1000 : 3000);
         }
 
     }, [message])
@@ -31,37 +54,33 @@ export function Toast({ message, close, duration, className }:ToastProps){
 
         setTimeout(() => {
                 close()
-        }, duration ?? 3000);
+        }, duration ?? 300);
     }
+
+    const glassBackgroundBlur = glass && backdropBlurMap[props.glassBlur ?? 'sm']
     
     return(
         <div 
+            ref={ ref }
             className={
                 classNames([
-                    `absolute top-0 -translate-y-full transition ease duration-300 flex justify-between p-2 drop-shadow-2xl`,
+                    `absolute top-0 -translate-y-full transition ease duration-300 flex justify-between`,
                     isOpen && 'translate-y-1/2', 
+                    glass && 'bg-white/[.07] shadow-button-up',
+                    glassBackgroundBlur,
                     className 
                 ])
             }
+            {...rest}
         >
-            <span className={classNames([`flex-1 text-center p-3`])}>
+            <span className={classNames([`flex-1 text-center p-5`])}>
                 { message }
             </span>
 
-            <CloseButton onClick={ handleClose }/>
+            <Icon onClick={ handleClose } name='x-circle' className="text-2xl self-start brightness-75 hover:brightness-100 px-1"/>
+
 
         </div>
     )
-}
+})
 
-export function CloseButton({ onClick, className }:ComponentPropsWithRef<'div'>){
-
-    const Line = ({className}:{className?:string}) => <div className={classNames([`border border-solid absolute top-[50%] w-full`, className])}/>
-    
-    return(
-        <div onClick={ onClick } className={classNames([`cursor-pointer w-[1rem] h-[1rem] rotate-[45deg] flex justify-center items-center p-2`, className])}>
-            <Line/>
-            <Line className={`rotate-[90deg]`}/>
-        </div>
-    )
-}
