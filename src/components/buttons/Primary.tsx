@@ -9,13 +9,14 @@ type baseProps = ComponentPropsWithRef<'button'> & {
 }
 
 type glassType = {
-    glass:true
+    glass?:true
     /** the size of blur to apply to the modal if glass prop is true*/
-    glassBlur:size
+    glassBlur?:size
 }
 
 type standardType = {
     glass?:false
+    glassBlur?:never
 }
 
 export type buttonProps =  baseProps & (standardType | glassType)

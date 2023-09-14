@@ -35,15 +35,16 @@ module.exports = {
         'button-press': 'button-press .05s ease both',
         'image-loading': 'img-loading 1s ease infinite',
         'image-loaded': 'img-loaded .5s ease .2s forwards',
-        'modal-open': 'modal-open .25s ease forwards',
-        'modal-scale-open': 'modal-scale-open .25s ease forwards',
+        'modal-open': 'modal-open .25s ease both',
+        'modal-scale-open': 'modal-scale-open .5s ease forwards',
         'modal-close-up': 'modal-close-up .25s ease forwards',
         'modal-close-down': 'modal-close-down .25s ease forwards',
         'modal-close-right': 'modal-close-right .25s ease forwards',
         'modal-close-left': 'modal-close-left .25s ease forwards',
-        'modal-scale-close': 'modal-scale-close .25s ease forwards',
+        'modal-scale-close': 'modal-scale-close .5s ease forwards',
         'input-valid': 'input-valid .25s ease-in-out both',
-        'hide-drawer': 'hide-drawer .25s ease-in-out forwards'
+        'drawer-open': 'drawer-open .5s ease forwards',
+        'hide-drawer': 'hide-drawer 1.5s ease forwards'
         
       },
 
@@ -92,13 +93,15 @@ module.exports = {
           },
           '100%':{ 
             opacity: '100%', 
-            transform: 'translate(0, 0)'
+            transform: 'translate(0, 0)',
           }
         },
         
         'modal-scale-open':{
           '0%': { 
             display:'block',
+          },
+          '20%': { 
             opacity: '0%', 
             transform: 'scale(0)'
           },
@@ -110,6 +113,7 @@ module.exports = {
         
         'modal-close-up':{
           '0%': { 
+            // display: 'block',
             opacity: '100%',
             transform: 'translate(0, -2rem)'
           },
@@ -173,13 +177,20 @@ module.exports = {
             transform: 'scale(1)',
             opacity: '100%'
           },
-          '100%':{ 
+          '80%':{ 
             transform: 'scale(0)',
             opacity: '0%',
+          },
+          '100%':{ 
             display: 'none',
           }
         },
 
+        'drawer-open': {
+          '100%': {
+            transform: 'translate(0, 0)'
+          },
+        },
         'hide-drawer': {
           '100%': {
             visibility: 'hidden'

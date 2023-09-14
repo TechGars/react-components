@@ -7,11 +7,9 @@ type variant = "top" | "right" | "bottom" | "left"
 type size = 'sm' | 'md' | 'lg'
 
 
-type baseProps = {
+interface baseProps extends HTMLAttributes<HTMLSpanElement> {
     isOpen :boolean
     variant: variant
-    backdrop?:boolean
-    glass?:boolean
     positioned?: drawerPositions
     closeDrawer: () => void
 }
@@ -19,6 +17,7 @@ type baseProps = {
 
 
 type backdrop = {
+    
     backdrop:true
     /** the size of background blur to apply behind the modal if backdrop props is true*/
     blur?:size
@@ -27,21 +26,27 @@ type backdrop = {
 }
 
 type backdropNone = {
+    
     backdrop?:false
+    blur?:never
+    opacity?:never
 }
 
 type glassType = {
-    glass:true
+    
+    glass?:true
     /** the size of blur to apply to the modal if glass prop is true*/
     glassBlur?:size
 }
 
 type standardType = {
-    glass?:false
+
+    glass?:never
+    glassBlur?:never
 }
 
 
-export type DrawerProps = HTMLAttributes<HTMLSpanElement> & baseProps & (backdrop | backdropNone) & (standardType | glassType)
+export type DrawerProps = baseProps & (backdrop | backdropNone) & (glassType | standardType)
 
 export const Drawer = forwardRef((props: DrawerProps, ref:Ref<HTMLSpanElement>) => {
 
@@ -70,7 +75,7 @@ export const Drawer = forwardRef((props: DrawerProps, ref:Ref<HTMLSpanElement>) 
 
     const openAnimationMap:{ [option in variant]:{open:string, close:string, autoPositioning:string}} = {
         top: { open:'translate-y-0', close:'-translate-y-full', autoPositioning:'justify-start items-start' },
-        right: { open:'translate-x-0', close:'translate-x-full', autoPositioning:'justify-end items-start' },
+        right: { open:'', close:'translate-x-full', autoPositioning:'justify-end items-start' },
         bottom: { open:'translate-y-0', close:'translate-y-full', autoPositioning:'justify-start items-end' },
         left: { open:'translate-x-0', close:'-translate-x-full', autoPositioning:'justify-start items-start' },
     }
@@ -108,7 +113,7 @@ export const Drawer = forwardRef((props: DrawerProps, ref:Ref<HTMLSpanElement>) 
             id='drawer'
             ref={ ref }
             className={classNames([
-                "absolute h-full w-full flex overflow-hidden",
+                "absolute h-full w-full flex overflow-hidden border border-red-500",
                 autoPositioning,
                 userSetPosition,
                 backdropBrightness,
@@ -120,9 +125,9 @@ export const Drawer = forwardRef((props: DrawerProps, ref:Ref<HTMLSpanElement>) 
 
             <span 
                 className={classNames([
-                    "transition ease-in-out duration-100 flex justify-center items-center",
-                    isOpen ? openAnimation : closeAnimation,
+                    "flex justify-center items-center transition ease-in-out duration-[1500ms]",
                     glass && 'bg-white/[.07] shadow-button-up',
+                    isOpen ? openAnimation : closeAnimation,
                     glassBackgroundBlur,
                     className
                 ])}

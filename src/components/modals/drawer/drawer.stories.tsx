@@ -1,5 +1,5 @@
 import { Drawer } from '.';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Primary } from '../../buttons/Primary';
 
 
@@ -143,8 +143,10 @@ export const Glass = () => {
         variant='right'
         glass
         glassBlur='lg'
+        backdrop
+        opacity='sm'
         closeDrawer={() => setIsOpen(false)}
-        className='w-1/3 h-full text-white text-2xl p-10 flex flex-col bg-dark-grey'
+        className='w-1/3 h-full text-white text-2xl p-10 flex flex-col'
       >
         <div className='text-5xl bg-main-gradient bg-clip-text text-transparent w-full h-full'>Click anywhere outside of the drawer to close</div>
       </Drawer>

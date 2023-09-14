@@ -19,6 +19,7 @@ type rounded = {
 
 type notRounded = {
     variant: 'standard' | 'underline'
+    radius: never
 }
 
 type glassType = {
@@ -28,7 +29,8 @@ type glassType = {
 }
 
 type standardType = {
-    glass?:false
+    glass:false
+    glassBlur:never
 }
 
 export type inputProps = InputHTMLAttributes<HTMLInputElement> & generalProps & (rounded | notRounded) & (standardType | glassType)
